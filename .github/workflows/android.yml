@@ -1,0 +1,41 @@
+
+name: Build APK KasirKu
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'KasirKu-Android-Project.zip'
+      - '.github/workflows/android.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ambil proyek
+        uses: actions/checkout@v4
+
+      - name: Siapkan Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Siapkan Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Ekstrak proyek
+        run: unzip -o KasirKu-Android-Project.zip -d .
+
+      - name: Bangun APK
+        run: gradle -p KasirKu assembleDebug
+
+      - name: Simpan APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: KasirKu-APK
+          path: KasirKu/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
